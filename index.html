@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bolão Oficial Bekinho</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0d3b1e;
+    color:white;
+    text-align:center;
+}
+header{
+    background:#146c37;
+    padding:15px;
+}
+h1{
+    margin:5px 0;
+}
+.container{
+    padding:20px;
+}
+.card{
+    background:#1f7a3f;
+    padding:15px;
+    border-radius:8px;
+    max-width:400px;
+    margin:10px auto;
+}
+input{
+    padding:8px;
+    margin:5px;
+    width:80px;
+    text-align:center;
+}
+input[type="text"]{
+    width:80%;
+}
+button{
+    padding:10px 15px;
+    background:gold;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:10px;
+}
+.ranking{
+    background:#124727;
+    padding:10px;
+    margin-top:20px;
+    border-radius:8px;
+}
+.admin{
+    margin-top:20px;
+}
+.admin-panel{
+    display:none;
+    background:#1c5e31;
+    padding:15px;
+    margin-top:10px;
+    border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🏆 Bolão Oficial Bekinho do Esporte</h1>
+<p>1º CAMPEONATO DE FUTEBOL SOCIETY ALTO 1</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h3>Participar da Rodada</h3>
+
+<input type="text" id="nome" placeholder="Nome"><br>
+<input type="text" id="whats" placeholder="WhatsApp"><br>
+
+<p>Time A vs Time B</p>
+<input type="number" id="placarA" placeholder="0">
+<input type="number" id="placarB" placeholder="0"><br>
+
+<button onclick="salvarPalpite()">Confirmar Palpite</button>
+
+</div>
+
+<div class="ranking">
+<h3>Ranking da Rodada</h3>
+<div id="listaRanking"></div>
+</div>
+
+<div class="admin">
+<h3>Área Admin</h3>
+<input type="password" id="senha" placeholder="Senha">
+<button onclick="loginAdmin()">Entrar</button>
+
+<div class="admin-panel" id="painelAdmin">
+<p>Total Arrecadado: R$ <span id="total"></span></p>
+<p>30% Organização: R$ <span id="org"></span></p>
+<p>70% Premiação: R$ <span id="premio"></span></p>
+</div>
+</div>
+
+</div>
+
+<script>
+
+let valorRodada = 10;
+let apostas = JSON.parse(localStorage.getItem("apostas")) || [];
+
+function salvarPalpite(){
+    let nome = document.getElementById("nome").value;
+    let whats = document.getElementById("whats").value;
+
+    if(!nome || !whats){
+        alert("Preencha nome e WhatsApp");
+        return;
+    }
+
+    // impede WhatsApp duplicado
+    if(apostas.some(p => p.whats === whats)){
+        alert("Esse WhatsApp já fez palpite!");
+        return;
+    }
+
+    apostas.push({nome, whats, pontos:0});
+    localStorage.setItem("apostas", JSON.stringify(apostas));
+    atualizarRanking();
+    alert("Palpite registrado!");
+}
+
+function atualizarRanking(){
+    let lista = document.getElementById("listaRanking");
+    lista.innerHTML = "";
+
+    apostas.forEach((p,i)=>{
+        lista.innerHTML += `<p>${i+1}º - ${p.nome} (${p.pontos} pts)</p>`;
+    });
+}
+
+function loginAdmin(){
+    let senha = document.getElementById("senha").value;
+
+    if(senha === "MIGUEL@2812"){
+        document.getElementById("painelAdmin").style.display="block";
+        calcularFinanceiro();
+    }else{
+        alert("Senha incorreta");
+    }
+}
+
+function calcularFinanceiro(){
+    let total = apostas.length * valorRodada;
+    document.getElementById("total").innerText = total.toFixed(2);
+    document.getElementById("org").innerText = (total * 0.3).toFixed(2);
+    document.getElementById("premio").innerText = (total * 0.7).toFixed(2);
+}
+
+atualizarRanking();
+
+</script>
+
+</body>
+</html>
